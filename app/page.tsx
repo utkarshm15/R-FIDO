@@ -1,6 +1,15 @@
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 import Image from "next/image";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+  if(session){
+    console.log("hello");
+    
+  }
+  console.log(session?.user);
+  
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
@@ -53,7 +62,8 @@ export default function Home() {
             </span>
           </h2>
           <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
+
+            {JSON.stringify(session?.user)}
           </p>
         </a>
 
