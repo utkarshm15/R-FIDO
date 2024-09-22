@@ -2,8 +2,6 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import prisma from "./db"
 import bcrypt from "bcrypt"
 
-let user_id =""
-let imageUrl = ""
 
 export const authOptions = {
     providers : [

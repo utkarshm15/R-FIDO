@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Provider } from "@radix-ui/react-toast";
+
 import "@uploadthing/react/styles.css";
 import { Toaster } from "@/components/ui/toaster";
+import { SessionProvider } from "next-auth/react";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,10 +23,10 @@ export default function RootLayout({
     <html lang="en">
       
       <body className={inter.className}>
-      <Provider>  
+        <Providers> 
         {children}
+        </Providers>
         <Toaster/>
-        </Provider>
         </body>
         
     </html>

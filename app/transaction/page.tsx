@@ -6,12 +6,16 @@ import * as faceapi from "face-api.js"
 import { getUsers } from "@/actions/getUsers"
 import { toast } from "@/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
+import { useRouter } from "next/navigation"
+import { ShootingStars } from "@/components/ui/shooting-stars"
+import { StarsBackground } from "@/components/ui/stars-background"
 
 
 
 
 export default function(){
-    const [init,setInit] = useState(false)
+    const [init,setInit] = useState(true)
+    const router = useRouter()
     const videoRef = useRef(null)
     const canvasRef = useRef(null)
 
@@ -85,7 +89,7 @@ export default function(){
                 return toast({
                     title:"Face not recognized",
                     description:"Do you want to pay by using phone no.?",
-                    action:<ToastAction altText="Continue"></ToastAction>
+                    action:<ToastAction onClick={()=>router.push("/phone")} altText="Continue">Continue</ToastAction>
                 })
             }
             const reseizedDetections = faceapi.resizeResults(detections,displaySize)
@@ -118,15 +122,31 @@ export default function(){
                     action:<ToastAction altText="Try Again" onClick={async()=>await handleVideoPlay()}>Try Again</ToastAction>
                 })
             }else{
-            window.location.href = "http://localhost:3000/transaction/"+result.toString().split("{}")[1]
+            localStorage.setItem("name",result.toString().split("{}")[0]);
+            router.push("/transaction/"+result.toString().split("{}")[1])
             }
         },1000)
     }
 
-    return <div>
-        <span>{init?"Initializing":"Ready"}</span>
-        <div className="flex justify-center">
-            <video ref={videoRef} autoPlay muted height="480" width="640" onPlay={handleVideoPlay}/>
+
+    return <div className="pt-20 min-h-dvh  bg-slate-950">
+        <div className="flex z-20 text-white justify-center " >
+            <div>{init?"Loading":"Ready"}</div>
+            <div>{init?<div
+  className="inline-block h-4 w-4 ml-2 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+  role="status">
+  <span
+    className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+    >Loading...</span
+  >
+</div>:<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+</svg>
+}</div>
+            
+        </div>
+        <div className="flex justify-center z-20">
+            <video className="rounded" ref={videoRef} autoPlay muted height="480" width="640" onPlay={handleVideoPlay}/>
             <canvas className="absolute" ref={canvasRef}></canvas>
         </div>
         

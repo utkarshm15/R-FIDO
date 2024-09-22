@@ -14,7 +14,7 @@ import Link from "next/link"
 import { toast } from "@/hooks/use-toast"
 
 const inputSchema = z.object({
-    phone : z.string().max(10),
+    phone : z.string().max(10).min(10),
     password : z.string().min(8,{message:"Password length should not be less than 8"}).max(16,{message:"Password length should not be more than 16"})
 })
 
@@ -48,7 +48,7 @@ export function Login(){
                     })
                     return
                 }
-                router.push("/")
+                router.push("/dashboard")
             }catch(err){
                 console.log(err);
                 

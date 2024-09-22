@@ -15,7 +15,7 @@ import { toast } from "@/hooks/use-toast"
 
 const inputSchema = z.object({
     name : z.string().min(1,{message:"This field is mandatory"}),
-    phone : z.string().max(10),
+    phone : z.string().max(10).min(10),
     password : z.string().min(8,{message:"Password length should not be less than 8"}).max(16,{message:"Password length should not be more than 16"}),
     confirmPassword : z.string()
 }).refine((data)=>{
@@ -66,7 +66,7 @@ export function Signup(){
                     
 })} className="border p-10 w-1/3 rounded-lg shadow bg-white">
             <Label className="text-4xl py-2 font-bold flex justify-center">Register Your Account</Label>
-            <Label className="text-sm pb-6 font-md flex justify-center">Enter your details to join R-FIDO.</Label>
+            <Label className="text-sm pb-6 font-md flex justify-center">Enter your details to join RFIDO.</Label>
                 <FormField control={form.control} name="name"  render={({field})=>(
                     <FormItem>
                         <FormLabel>Name</FormLabel>

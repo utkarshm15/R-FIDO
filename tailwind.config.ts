@@ -1,3 +1,7 @@
+const {
+	default: flattenColorPalette,
+  } = require("tailwindcss/lib/util/flattenColorPalette");
+
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -7,12 +11,16 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkmode:"class",
   theme: {
   	extend: {
   		backgroundImage: {
   			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
   			'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
   		},
+		  backdropBlur: {
+			xs: '2px',
+		  },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -59,9 +67,35 @@ const config: Config = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
-  		}
+  		},
+		  animation: {
+			spotlight: "spotlight 2s ease .75s 1 forwards",
+		  },
+		  keyframes: {
+			spotlight: {
+			  "0%": {
+				opacity: "0",
+				transform: "translate(-72%, -62%) scale(0.5)",
+			  },
+			  "100%": {
+				opacity: "1",
+				transform: "translate(-50%,-40%) scale(1)",
+			  },
+			},
+		  },
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"),addVariablesForColors],
 };
+
+function addVariablesForColors({ addBase, theme }: any) {
+	let allColors = flattenColorPalette(theme("colors"));
+	let newVars = Object.fromEntries(
+	  Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+	);
+   
+	addBase({
+	  ":root": newVars,
+	});
+  }
 export default config;

@@ -6,6 +6,12 @@ import { getServerSession } from "next-auth";
 
 export async function transfer(to: string, amount: number,value:string) {
     const session = await getServerSession(authOptions);
+    if(session.user.id==to){
+        return {
+            ok:false,
+            message:"You can not send money to yourself"
+        }
+    }
     try{
         console.log(to);
         
@@ -40,10 +46,11 @@ export async function transfer(to: string, amount: number,value:string) {
             message: "Error while sending"
         }
     }
+    
     try{
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async(tx) => {
         await tx.$queryRaw`SELECT * FROM "User" WHERE "id" = ${to} FOR UPDATE`;
-
+        
         const fromBalance = await tx.user.findUnique({
             where: { id: to },
           });
@@ -60,7 +67,20 @@ export async function transfer(to: string, amount: number,value:string) {
             where: { id: from },
             data: { balance: { increment: amount } },
           });
+          
+          await tx.transaction.create({
+            data:{
+                toUserId:session.user.id,
+                fromUserId:to,
+                amount,
+                date: new Date()
+            }
+        })
+
           })
+
+          
+
           return {
             ok:true
           }
