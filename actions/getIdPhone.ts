@@ -1,9 +1,18 @@
 "use server"
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { getServerSession } from "next-auth";
 
 export async function getId(phone : string){
+    
+    const session = await getServerSession(authOptions);
+    if(!session || !session.user){
+        return {
+            ok:false,
+            message:"Unauthorized Request"
+        }
+    }
     try{
-        console.log(phone);
         
         const id = await prisma.user.findFirst({
             where:{
@@ -12,7 +21,7 @@ export async function getId(phone : string){
             select:{
                 id:true            }
         })
-        console.log("jello");
+    
         
         console.log(id?.id);
         

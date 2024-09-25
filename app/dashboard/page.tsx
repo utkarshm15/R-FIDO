@@ -30,15 +30,8 @@ export default function(){
     const router = useRouter()
     const session = useSession();
 
-    if(!session ){
-        router.push("/login")
-    }
-    console.log(session.data?.user?.image);
-    if(session.data?.user?.email){
-        if(!session.data.user.image){
-            router.push("/verify")
-        }
-    }
+    
+
     
     const [balance,setBalance] = useState(0);
     const [user,setUser] = useState("");
@@ -48,7 +41,9 @@ export default function(){
              
             const res = await getData();
              
-             
+             if(res.img===""){
+                router.push("/verify")
+             }
              if(res.ok && res.balance){
              setBalance(res.balance)
              setTransaction(res.transaction)

@@ -5,6 +5,12 @@ import { getServerSession } from "next-auth";
 
 export async function getData(){
     const session = await getServerSession(authOptions)
+    if(!session || !session.user){
+        return {
+            ok:false,
+            message:"Unauthorized Request"
+        }
+    }
     try {
         const res = await prisma.$transaction([
             prisma.user.findFirst({
@@ -12,7 +18,7 @@ export async function getData(){
                     id:session.user.id
                 },
                 select:{
-                    balance:true,id:true
+                    balance:true,id:true,image:true
                 }}),
                 prisma.transaction.findMany({
                     where:{
@@ -34,6 +40,7 @@ export async function getData(){
         
         return {
             ok:true,
+            img:res[0]?.image,
             id:res[0]?.id,
             balance:res[0]?.balance,
             transaction:res[1]

@@ -6,6 +6,12 @@ import { getServerSession } from "next-auth";
 
 export async function transfer(to: string, amount: number,value:string) {
     const session = await getServerSession(authOptions);
+    if(!session || !session.user){
+        return {
+            ok:false,
+            message:"Unauthorized Request"
+        }
+    }
     if(session.user.id==to){
         return {
             ok:false,

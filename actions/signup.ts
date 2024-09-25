@@ -12,11 +12,6 @@ export async function signup({name,phone,password}:SignupUser){
     const otp = Math.floor(Math.random()*1000000).toString();
     const hashedPassword = await bcrypt.hash(password,10)
     try{
-        //check if user exists 
-        //if exists check if verified 
-        // if verified then show error and redirect to signin
-        // if not verified then save new entries and send him to get verified
-        //if user does not exists then below code
         const existingUser = await prisma.user.findFirst({
             where:{
                 phone

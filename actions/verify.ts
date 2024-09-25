@@ -6,6 +6,12 @@ import { getServerSession } from "next-auth"
 
 export async function verify({url,value}:{url:string,value:string}){
     const session = await getServerSession(authOptions);
+    if(!session || !session.user){
+        return {
+            ok:false,
+            message:"Unauthorized Request"
+        }
+    }
     try{
         await prisma.user.update({where:{
             id:session.user.id
