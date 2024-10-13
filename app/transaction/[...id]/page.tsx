@@ -41,15 +41,15 @@ export default function(){
     }
 
     
-    return <div className="bg-gradient-to-r from-black via-slate-950 to-black from-30% to-70% pt-40 min-h-dvh"> 
-    <div className="p-1 shadow-lg border rounded-lg bg-black text-white mx-96 pb-4">
-        <div className="mx-auto text-2xl  text-center mt-10  ">
+    return <div className="bg-gradient-to-r from-black via-slate-950 to-black from-30% to-70% pt-40 min-h-lvh"> 
+    <div className="p-1 shadow-lg border rounded-lg bg-black text-white mx-10 sm:mx-96 pb-4">
+        <div className="mx-auto sm:text-2xl text-lg text-center mt-10  ">
             Enter Amount 
             <Input  onChange={(e)=>setAmount(Number(e.target.value))} className="w-3/5 my-4 text-black mx-auto text-center" autoFocus type="number" placeholder=""></Input>
         </div >
-        <p className="text-2xl text-center">Enter Pin</p>
+        <p className="sm:text-2xl text-lg text-center">Enter Pin</p>
         <InputOTP className="" onChange={(value)=>setValue(value)} value={value} maxLength={4} pattern={REGEXP_ONLY_DIGITS} >
-      <InputOTPGroup className="mx-auto bg-white  text-black rounded my-4">
+      <InputOTPGroup className="mx-auto bg-white   text-black rounded my-4">
         <InputOTPSlot typeof="password" index={0} />
         <InputOTPSlot index={1} />
         <InputOTPSlot index={2} />

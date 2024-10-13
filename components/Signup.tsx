@@ -40,8 +40,8 @@ export function Signup(){
             confirmPassword:""
         }
     })
-    return <div className="h-dvh flex flex-col justify-center bg-slate-200">
-     <div className="flex justify-center  ">
+    return <div className="h-lvh flex flex-col justify-center bg-slate-200">
+     <div className="flex justify-center py-10 ">
         <Form {...form}>
             <form onSubmit={form.handleSubmit(async(data:z.infer<typeof inputSchema>)=>{
                     const res = await signup(data);
@@ -64,9 +64,9 @@ export function Signup(){
                         }
                     }
                     
-})} className="border p-10 w-1/3 rounded-lg shadow bg-white">
-            <Label className="text-4xl py-2 font-bold flex justify-center">Register Your Account</Label>
-            <Label className="text-sm pb-6 font-md flex justify-center">Enter your details to join RFIDO.</Label>
+})} className="border lg:p-10  lg:w-1/3 sm:p-6 p-4 rounded-lg shadow bg-white">
+            <Label className="lg:text-4xl text-2xl py-2 font-bold flex justify-center">Register Your Account</Label>
+            <Label className="lg:text-sm text-xs sm:pb-6 pb-2 font-md flex justify-center">Enter your details to join RFIDO.</Label>
                 <FormField control={form.control} name="name"  render={({field})=>(
                     <FormItem>
                         <FormLabel>Name</FormLabel>
@@ -107,7 +107,7 @@ export function Signup(){
                 <div className="flex justify-center mt-4 ">
                 <Button  className="w-full" type="submit">Submit</Button>
                 </div>
-                <div className="text-sm pt-2 pb-6 font-md flex justify-center">Already have an account ? <Link className="underline ml-1 text-sky-600 hover:text-blue-400" href={"/login"}>Login</Link></div>
+                <div className="sm:text-sm text-xs pt-2 pb-6 font-md flex justify-center">Already have an account ? <Link className="underline ml-1 text-sky-600 hover:text-blue-400" href={"/login"}>Login</Link></div>
             </form>
         </Form>
     </div>

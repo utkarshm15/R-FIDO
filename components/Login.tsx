@@ -54,9 +54,9 @@ export function Login(){
                 
             }
                 
-    })} className="border p-10 w-1/3 rounded-lg shadow bg-white">
-           <Label className="text-4xl py-2 font-bold flex justify-center">Login</Label>
-           <Label className="text-sm pb-6 font-md flex justify-center">Enter your details to log into R-FIDO.</Label>
+    })} className="border sm:p-10 sm:w-1/3 p-4 rounded-lg shadow bg-white">
+           <Label className="sm:text-4xl text-2xl py-2 font-bold flex justify-center">Login</Label>
+           <Label className="sm:text-sm text-xs sm:pb-6 pb-2 font-md flex justify-center">Enter your details to log into R-FIDO.</Label>
            
            <FormField control={form.control} name="phone"  render={({field})=>(
                    <FormItem>
@@ -79,7 +79,7 @@ export function Login(){
                <div className="flex justify-center mt-4 ">
                <Button  className="w-full" type="submit">Submit</Button>
                </div>
-               <div className="text-sm pt-2 pb-6 font-md flex justify-center">Don't have an account ? <Link className="underline ml-1 text-sky-600 hover:text-blue-400" href={"/signup"}>SignUp</Link></div>
+               <div className="sm:text-sm text-xs pt-2 pb-6 font-md flex justify-center">Don't have an account ? <Link className="underline ml-1 text-sky-600 hover:text-blue-400" href={"/signup"}>SignUp</Link></div>
            </form>
        </Form>
    </div>

@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# R-FIDO (Realtime Face Identification Outlay)
 
-## Getting Started
+This is a web application that enables payments using face recognition technology. The sender is identified via face recognition, and the payment is sent to the receiver's account by scanning the sender's face using the receiver's device.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
+- **Face Recognition**: Utilizes face recognition to identify the sender during a payment transaction.
+- **Next.js**: Built using Next.js for both server-side and client-side rendering.
+- **PostgreSQL & Prisma**: PostgreSQL is used as the database, with Prisma as the ORM for handling database interactions.
+- **Uploadthing**: Handles image uploads for user profiles and facial data.
+- **Face-api.js**: Library used for facial recognition functionality.
+- **Modern Styling**: Uses Tailwind CSS, ShadCN, and Aeternity UI for building a responsive and visually appealing user interface.
+
+## Tech Stack
+
+- **Next.js**: Frontend framework.
+- **PostgreSQL**: Database for storing user and transaction information.
+- **Prisma**: ORM to manage the database schema and queries.
+- **Uploadthing**: Service for uploading and managing user images.
+- **Face-api.js**: JavaScript API for face recognition and detection.
+- **Tailwind CSS**: Utility-first CSS framework for styling.
+- **ShadCN**: Components that extend Tailwind CSS for UI design.
+- **Aeternity UI**: UI components to create a modern and responsive user interface.
+
+
+## Setup
+
+To run this project locally, follow the instructions below:
+
+### Prerequisites
+
+- **Node.js** and **npm** or **yarn**
+- **PostgreSQL** database
+- **Uploadthing** account for handling image uploads
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/utkarshm15/R-FIDO.git
+   cd R-FIDO
+   ```
+
+2. Install the dependencies:
+```
+npm install
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Set up environment variables:
+Create a .env file in the root of the project and add the following:
+```
+DATABASE_URL="postgresql://username:password@localhost:5432/your-database"
+UPLOADTHING_APP_ID="your-uploadthing-app-id"
+UPLOADTHING_SECRET="your-uploadthing-secret"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="add_a_secret"
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Run database migrations:
+```
+npx prisma migrate dev
+# or 
+pnpm dlx prisma migrate dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+5. Start the development server:
+```
+npm run dev
+# or
+pnpm dev
+```
+The application will be available at http://localhost:3000.
 
-## Learn More
+# Usage
+•	Register as a user and upload an image to use for facial recognition.
+•	Create a pin for security of transactions.
+•	Add balance to you wallet.
+•	Scan your face to send payments to another user.
+# Project Structure
+•	app/: Contains the Next.js pages and layouts for the web application.
+•	prisma/: Includes Prisma schema for the PostgreSQL database.
+•	lib/: Contains reusable utility functions and configurations.
+•	components/: Reusable UI components for the web app.
+•	actions/: Contains server actions.
+•	hooks/: Contains custom hooks.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
