@@ -1,12 +1,13 @@
+
 import { Navbar } from "@/components/Navbar";
 import { Cover } from "@/components/ui/cover";
 import { FlipWords } from "@/components/ui/flip-words";
 import { Spotlight } from "@/components/ui/Spotlight";
 
+
 import Link from "next/link";
 
 export default async function(){
-  
   return <div className="sm:py-44 py-20 text-center text-stone-300 bg-black flex flex-col gap-8 font-bold  h-lvh">
    <Navbar></Navbar>
     <Spotlight className="sm:-top-40 -top-20 left-0 md:left-60 md:-top-20"

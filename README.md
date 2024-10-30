@@ -22,6 +22,29 @@ This is a web application that enables payments using face recognition technolog
 - **ShadCN**: Components that extend Tailwind CSS for UI design.
 - **Aeternity UI**: UI components to create a modern and responsive user interface.
 
+## Screenshots
+
+- Landing Page
+![landing](./public/screenshots/landing.png)
+
+- Registration Page
+![register](./public/screenshots/register.png)
+
+- Login Page
+![login](./public/screenshots/login.png)
+
+- Dashboard
+![dashboard](./public/screenshots/beforeDashboard.png)
+
+-Face Recognition Screen
+![faceRecognition](./public/screenshots/faceRecog.png)
+
+- Payment Screen
+![payment](./public/screenshots/paymentScreen.png)
+
+- Updated Balance
+![balanceUpdate](./public/screenshots/afterDashboard.png)
+
 
 ## Setup
 
@@ -76,14 +99,22 @@ The application will be available at http://localhost:3000.
 
 # Usage
 •	Register as a user and upload an image to use for facial recognition.
+
 •	Create a pin for security of transactions.
+
 •	Add balance to you wallet.
+
 •	Scan your face to send payments to another user.
 # Project Structure
 •	app/: Contains the Next.js pages and layouts for the web application.
+
 •	prisma/: Includes Prisma schema for the PostgreSQL database.
+
 •	lib/: Contains reusable utility functions and configurations.
+
 •	components/: Reusable UI components for the web app.
+
 •	actions/: Contains server actions.
+
 •	hooks/: Contains custom hooks.
 

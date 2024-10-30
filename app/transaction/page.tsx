@@ -45,17 +45,19 @@ export default function(){
     }
     async function loadLabeledImages(){
         const {res} = await getUsers()
-        const labels = res?.map((user)=>(user.image!=""?{label:user.name+"{}"+user.id,
+        const labels = res?.filter((user)=>{
+            if(user.image!="")
+                return true
+            else
+                return false
+        }).map((user)=>({label:user.name+"{}"+user.id,
             img:user.image
-        }:""))
+        }))
         if(!labels){
             return
         }
         return Promise.all(
             labels.map(async label =>{
-                if(label==""){
-                    return
-                }
                 const img = await faceapi.fetchImage(label.img)
                 const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
                 if(!detections){
