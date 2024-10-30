@@ -25,24 +25,31 @@ This is a web application that enables payments using face recognition technolog
 ## Screenshots
 
 - Landing Page
+
 ![landing](./public/screenshots/landing.png)
 
 - Registration Page
+
 ![register](./public/screenshots/register.png)
 
 - Login Page
+
 ![login](./public/screenshots/login.png)
 
 - Dashboard
+
 ![dashboard](./public/screenshots/beforeDashboard.png)
 
--Face Recognition Screen
+- Face Recognition Screen
+
 ![faceRecognition](./public/screenshots/faceRecog.png)
 
 - Payment Screen
+
 ![payment](./public/screenshots/paymentScreen.png)
 
 - Updated Balance
+
 ![balanceUpdate](./public/screenshots/afterDashboard.png)
 
 
