@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
 
-export async function getData(){
+export async function getBalance(){
     const session = await getServerSession(authOptions)
     if(!session || !session.user){
         return {
@@ -12,38 +12,48 @@ export async function getData(){
         }
     }
     try {
-        const res = await prisma.$transaction([
-            prisma.user.findFirst({
+        const res = await prisma.user.findFirst({
                 where:{
                     id:session.user.id
                 },
                 select:{
-                    balance:true,id:true,image:true
-                }}),
-                prisma.transaction.findMany({
-                    where:{
-                        OR:[
-                            {
-                                toUserId:session.user.id
-                            },
-                            {
-                                fromUserId:session.user.id
-                            }
-                        ]
-                    },
-                    orderBy:[{
-                        date:"desc"
-                    },]
-                })
-        ])
+                    balance:true
+                }})
 
-        
         return {
             ok:true,
-            img:res[0]?.image,
-            id:res[0]?.id,
-            balance:res[0]?.balance,
-            transaction:res[1]
+            balance:res!.balance,
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            ok:false
+        }
+        
+    }
+}
+
+export async function getImage(){
+    const session = await getServerSession(authOptions)
+    if(!session || !session.user){
+        return {
+            ok:false,
+            message:"Unauthorized Request"
+        }
+    }
+    try {
+        const res = await prisma.user.findFirst({
+                where:{
+                    id:session.user.id
+                },
+                select:{
+                    image:true,
+                }})
+
+        return {
+            ok:true,
+            image:res?.image,
+
         }
     } catch (error) {
         console.log(error);

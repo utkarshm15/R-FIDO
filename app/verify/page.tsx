@@ -26,9 +26,10 @@ export default function Home() {
     const router = useRouter()
     
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4  p-10">
+    <main className="flex min-h-screen text-white flex-col bg-gradient-to-tr via-slate-950 from-black to-black items-center justify-center gap-4  p-10">
         <div className="text-center text-xl font-lg">To complete your registration upload your photo for face <br />recognition and create your payment pin for payment verification.</div>
       <UploadDropzone
+      className="bg-slate-900"
         endpoint="imageUploader"
         onClientUploadComplete={(res) => {
           // Do something with the response
@@ -40,7 +41,7 @@ export default function Home() {
           alert(`ERROR! ${error.message}`);
         }}
       />
-      <div className="mx-auto border p-10 rounded-lg">
+      <div className="mx-auto border bg-slate-900 p-10 rounded-lg">
       <div className="my-2">Enter Pin </div>
       <InputOTP onChange={(value)=>setValue(value)} value={value} maxLength={4} pattern={REGEXP_ONLY_DIGITS} >
       <InputOTPGroup>
@@ -51,7 +52,7 @@ export default function Home() {
       </InputOTPGroup>
     </InputOTP>
       </div>
-      <button className="rounded-lg bg-blue-400 p-2" onClick={async()=>{
+      <button className="rounded-lg bg-blue-500/30 border border-blue-500 p-2 px-8 hover:bg-slate-900" onClick={async()=>{
         console.log(value,url);
         
         if(value.length<4 || url===""){

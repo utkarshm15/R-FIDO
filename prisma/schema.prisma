@@ -22,6 +22,8 @@ model User{
   pin String
   verificationCode String
   balance Int
+  faceDiscriptor Json?
+  monthlyBalance Int[]@default([])
   sentTransfers Transaction[] @relation(name: "fromUser")
   recievedTransfers Transaction[] @relation(name: "toUser")
 }

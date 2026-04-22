@@ -64,14 +64,26 @@ export async function transfer(to: string, amount: number,value:string) {
             throw new Error('Insufficient funds');
           }
 
-          await tx.user.update({
+          const newR = await tx.user.update({
             where: { id: to },
             data: { balance: { decrement: amount } },
+            select :{balance:true}
+          });
+         
+          await tx.user.update({
+            where: { id: to },
+            data: { monthlyBalance: { push:newR.balance } }
+          });
+
+          const newS = await tx.user.update({
+            where: { id: from },
+            data: { balance: { increment: amount } },
+            select:{balance:true}
           });
 
           await tx.user.update({
             where: { id: from },
-            data: { balance: { increment: amount } },
+            data: { monthlyBalance: { push:newS.balance } }
           });
           
           await tx.transaction.create({

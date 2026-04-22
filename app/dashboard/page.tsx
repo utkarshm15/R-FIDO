@@ -1,149 +1,164 @@
-"use client"
-import { addBalance } from "@/actions/addBalance"
-import { getData } from "@/actions/getBalance"
-import { BalanceCard } from "@/components/BalanceCard"
-import { Navbar } from "@/components/Navbar"
-import { Cover } from "@/components/ui/cover"
-import { ShootingStars } from "@/components/ui/shooting-stars"
-import { StarsBackground } from "@/components/ui/stars-background"
-import { toast } from "@/hooks/use-toast"
-import { useSession } from "next-auth/react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+"use client";
+import { addBalance } from "@/actions/addBalance";
+import { getRunningBalance } from "@/actions/getRunningBalance";
+import { getImage } from "@/actions/getBalance";
+import { BalanceCard } from "@/components/BalanceCard";
 
+import { toast } from "@/hooks/use-toast";
+import { useSession } from "next-auth/react";
+import {  useRouter } from "next/navigation";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { LineChart } from "@mui/x-charts";
 
-
-interface sentType {
-    id: string,
-    amount: number,
-    date: Date,
-    fromUserId: string,
-    toUserId: string,
-    color? : string
+interface Data {
+  day: string;
+  balance: number;
 }
 
-export default function(){
-    const [open,setOpen] = useState(false)
-    const [transaction,setTransaction] = useState<sentType[]>([])
-    
-    const router = useRouter()
-    const session = useSession();
 
-    
+export default function () {
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState<Data[]>([]);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  const router = useRouter();
+  const session = useSession();
 
-    
-    const [balance,setBalance] = useState(0);
-    const [user,setUser] = useState("");
-    const [loading,setLoading] = useState(true);
-    useEffect(()=>{
-         async function getBalance() {
-             
-            const res = await getData();
-             
-             if(res.img===""){
-                router.push("/verify")
-             }
-             if(res.ok && res.balance){
-             setBalance(res.balance)
-             setTransaction(res.transaction)
-             }
-             if(res.id){
-                setUser(res.id)
-             }
-            setLoading(false);
-        }
-        getBalance()
-    },[])
-    
-    
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  useEffect(() => {
+    async function getBalance() {
+      if (session.status === "loading") return;
+      
+      if (session.status === "unauthenticated") {
+        router.push("/login");
+        return;
+      }
 
-    if(loading){
-        return <div>
-            <div className='flex space-x-2 justify-center items-center bg-black h-screen dark:invert'>
- 	<span className='sr-only'>Loading...</span>
-  	<div className='h-8 w-8 bg-white rounded-full animate-bounce [animation-delay:-0.3s]'></div>
-	<div className='h-8 w-8 bg-white rounded-full animate-bounce [animation-delay:-0.15s]'></div>
-	<div className='h-8 w-8 bg-white rounded-full animate-bounce'></div>
-</div>
-        </div>
+      const res = await getImage();
+
+      if (res.image === "") {
+        router.push("/verify");
+        return;
+      }
+
+      const res1 = await getRunningBalance();
+      if(!res1.ok){
+        toast({
+            title:"Error",
+            description:res1.message,
+            variant:"destructive"
+        })
+        setLoading(false);
+        return;
+      }
+      if(res1.data) setData(res1.data);
+      setLoading(false);
     }
+    getBalance();
+  }, [session.status, router]);
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
+        <div className="flex space-x-2 justify-center items-center dark:invert">
+          <span className="sr-only">Loading...</span>
+          <div className="h-8 w-8 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+          <div className="h-8 w-8 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+          <div className="h-8 w-8 bg-white rounded-full animate-bounce"></div>
+        </div>
+      </div>
+    );
+  }
 
 
-    return <div className="relative bg-slate-950 min-h-lvh pt-16">
-        <Navbar></Navbar>
-    <div className="sm:grid grid-cols-2  relative ">
-        {open?<Modal setState={setOpen}></Modal>:null}
-        <div>
-        <div className="">
-            <BalanceCard setState={setOpen} balance={balance}></BalanceCard>
-        </div>    
-        <div className="pt-12 flex justify-center my-auto  ">
-        <div onClick={()=>router.push("/transaction")} className="rounded-md z-10 font-semibold  flex flex-col justify-center h-40 sm:h-64 w-2/3 cursor-pointer  hover:backdrop-blur-xs transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105  border  text-white   text-4xl text-center"> Request
+  const isMobile = windowWidth < 640;
+  const isTablet = windowWidth >= 640 && windowWidth < 1024;
+  
+  return (
+    <div className="flex flex-col gap-4 flex-1 text-white p-4 md:p-6 lg:p-8 overflow-y-auto">
+      <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-center py-2">Running Balance</h2>
+      <div className="text-black w-full">
+        <div className="bg-white/60 backdrop-blur-lg backdrop-filter rounded-lg p-2 md:p-4">
+          <LineChart
+            xAxis={[{ 
+              data: data.map((item) => item.day),
+              scaleType: 'point',
+              tickLabelStyle: {
+                angle: isMobile ? 45 : 0,
+                textAnchor: isMobile ? 'start' : 'middle',
+                fontSize: isMobile ? 10 : 12,
+              }
+            }]}
+            series={[
+              {
+                data: data.map((item) => item.balance),
+                label: 'Balance (₹)',
+                color: '#3b82f6',
+              },
+            ]}
+            margin={{ 
+              top: 20, 
+              right: isMobile ? 10 : 40, 
+              bottom: isMobile ? 60 : 50, 
+              left: isMobile ? 40 : 60 
+            }}
+            height={isMobile ? 300 : isTablet ? 350 : 400}
+            sx={{
+              width: '100%',
+              '& .MuiChartsAxis-root': { 
+                color: '#000000 !important' 
+              },
+              '& .MuiChartsAxis-tick': { 
+                stroke: '#000000 !important' 
+              },
+              '& .MuiChartsAxis-tickLabel': { 
+                fill: '#000000 !important',
+                fontSize: isMobile ? '10px' : '12px'
+              },
+              '& .MuiChartsLegend-root': {
+                display: isMobile ? 'none' : 'block'
+              }
+            }}
+          />
         </div>
+      </div>
+      
+      {/* Additional Info Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        <div className="bg-white/10 backdrop-blur-lg rounded-lg p-4">
+          <h3 className="text-sm md:text-base text-gray-300 mb-1">Current Balance</h3>
+          <p className="text-xl md:text-2xl font-bold">
+            ₹{data.length > 0 ? data[data.length - 1].balance : 0}
+          </p>
         </div>
-        
+        <div className="bg-white/10 backdrop-blur-lg rounded-lg p-4">
+          <h3 className="text-sm md:text-base text-gray-300 mb-1">Peak Balance</h3>
+          <p className="text-xl md:text-2xl font-bold">
+            ₹{data.length > 0 ? Math.max(...data.map(d => d.balance)) : 0}
+          </p>
         </div>
-        <div className="  z-10  mt-10 rounded pt-4  h-[30rem] sm:h-[40rem] shadow   ">
-        <div className="sm:text-4xl text-2xl font-semibold text-transparent  bg-gradient-to-b from-slate-950 via-white to-white bg-clip-text text-center">Transactions</div>
-        <div className="overflow-auto pt-2 h-5/6 ">
-            <div>
-                <div className="py-4 overflow-auto   rounded mx-4 px-10 sm:px-20">
-                    {transaction.length==0?"no transactions":transaction.map((r)=>{
-                        if(user==r.toUserId){
-                            r.color="bg-gradient-to-r from-lime-800 via-lime-600 to-lime-800"
-                        }else{
-                            r.color="bg-gradient-to-r from-red-900 via-red-700 to-red-900"
-                        }
-                        return <div className={"flex justify-center text-white my-2 font-semibold sm:w-3/5 py-2 text-center mx-auto rounded-full my-1  sm:text-lg "+r.color}><div className="mr-6">₹ {r.amount}</div><div> {+r.date.getDate()+"/"+r.date.getMonth()+"/"+r.date.getFullYear()}</div><div className="ml-4">  {r.date.getHours()+":"+r.date.getMinutes()}</div></div>})}
-                </div>
-            </div>
+        <div className="bg-white/10 backdrop-blur-lg rounded-lg p-4">
+          <h3 className="text-sm md:text-base text-gray-300 mb-1">Total Days</h3>
+          <p className="text-xl md:text-2xl font-bold">{data.length}</p>
         </div>
-    </div>        
+        <div className="bg-white/10 backdrop-blur-lg rounded-lg p-4">
+          <h3 className="text-sm md:text-base text-gray-300 mb-1">Latest Update</h3>
+          <p className="text-xl md:text-2xl font-bold">
+            {data.length > 0 ? data[data.length - 1].day : 'N/A'}
+          </p>
+        </div>
+      </div>
     </div>
-    <ShootingStars/>
-        <StarsBackground/>
-    </div>
-    
+  );
 }
 
-function Modal({setState}:{setState:Dispatch<SetStateAction<boolean>>}){
-    const router = useRouter()
-    const [amount,setAmount] = useState(0);
-    return <div className="flex justify-center absolute bg-black/[0.6] h-lvh inset-0 z-40  ">
-        <div className="flex flex-col gap-6 bg-white h-60 drop-shadow-2xl rounded   sm:px-28 py-10 text-center ">
-        <div className="absolute top-0 right-0 bg-red-600 py-1 px-3 rounded-tr cursor-pointer rounded-bl text-white" onClick={()=>setState(false)}>X</div>
-        <div className="sm:text-4xl text-2xl font font-semibold">
-           Enter Amount
-        </div>
-        <input onChange={(e)=>setAmount(Number(e.target.value))} className="shadow bg-gray-200/[0.9] rounded border border-1 border-black text-lg sm:text-2xl font-semibold px-2 text-center" autoFocus type="number"  />
-        <div onClick={async()=>{
-            if(amount===0){
-                return toast({
-                    variant : "destructive",
-                    title : "Invalid Request",
-                    description : "Please enter an appropriate amount"
-                })
-            }
-            const res = await addBalance(amount)
-            if(!res.ok){
-                return toast({
-                    variant : "destructive",
-                    title : "Something Went Wrong",
-                    description : res.message
-                })
-            }
-            toast({
-                title : "Successful",
-                description : res.message,
-                className:"bg-green-500"
-            })
-            setState(false);
-            router.push("/dashboard")
-            
-        }} className="cursor-pointer bg-rose-400 hover:bg-rose-600 w-fit mx-auto px-3 py-1 rounded-lg text-white font-lg text-xl">
-            Add
-        </div>
-        </div>
-    </div>
-}
+
+
+
+

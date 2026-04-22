@@ -16,22 +16,17 @@ export const authOptions = {
                     return null
                 }
                 
-                try{
-                    console.log("hello2");
-                    
-                    const existingUser = await prisma.user.findFirst({where:{phone:credentials?.phone}})
-                    console.log("hello4");
-                    
+                try{                    
+                    const existingUser = await prisma.user.findFirst({where:{phone:credentials?.phone}})                    
                     if(!existingUser){
                         throw new Error("User does not exist")
                     }
                     
                     
                     const res = await bcrypt.compare(credentials.password,existingUser.password)
-
+                    
                     
                     if(!res){
-                        console.log("hello5");
                         throw new Error("Invalid Password")
                     }
                     
@@ -50,18 +45,12 @@ export const authOptions = {
     secret:process.env.NEXTAUTH_SECRET
     ,callbacks: {
         jwt: async ({ session, token }: any) => {
-        if (session) {
-            token.uid = session.id;
-        }
-        console.log(session);
-        
+            if(session) token.uid = session.id;
 
         return token;
         },
       session: ({ session, token, user }: any) => {
-          if (session.user) {
-              session.user.id = token.sub
-          }
+        if(session.user) session.user.id = token.sub
           return session
       }
     },

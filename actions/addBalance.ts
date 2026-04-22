@@ -13,7 +13,8 @@ export async function addBalance(amount:number){
         }
     }
     try{
-        await prisma.user.update({
+        await prisma.$transaction(async(tx)=>{
+            const user = await tx.user.update({
                 where :{
                     id:session.user.id
                 },
@@ -21,8 +22,22 @@ export async function addBalance(amount:number){
                     balance:{
                         increment:amount
                     }
+                },select:{
+                    balance:true
                 }
             })
+
+            await tx.user.update({
+                where:{
+                    id:session.user.id
+                },data:{
+                    monthlyBalance:{
+                        push:user.balance
+                    }
+                }
+            })
+        })
+        
         return {
             ok:true,
             message:"Balance updated succesfully"

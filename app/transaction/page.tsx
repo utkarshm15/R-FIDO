@@ -3,21 +3,24 @@
 
 import { useEffect, useRef, useState } from "react"
 import * as faceapi from "face-api.js"
-import { getUsers } from "@/actions/getUsers"
 import { toast } from "@/hooks/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { useRouter } from "next/navigation"
-import { ShootingStars } from "@/components/ui/shooting-stars"
-import { StarsBackground } from "@/components/ui/stars-background"
+import getLabeledImages from "@/actions/getLabeledImages"
 
+interface SerializedLabeledFaceDescriptors {
+  label: string;
+  descriptors: number[][];
+}
 
 
 
 export default function(){
     const [init,setInit] = useState(true)
+    const streamRef = useRef<MediaStream|null>(null);
     const router = useRouter()
-    const videoRef = useRef(null)
-    const canvasRef = useRef(null)
+    const videoRef = useRef< HTMLVideoElement|null>(null)
+    const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
     useEffect(()=>{
         async function loadModels(){
@@ -32,46 +35,50 @@ export default function(){
             ]).then(startVideo)
         }
         loadModels();
+        return ()=>{
+            stopVideo()
+        }
     },[])
 
     function startVideo(){
-
+        if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
         if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
             navigator.mediaDevices.getUserMedia({video:true}).then(function(stream){
-                //@ts-expect-error
-                videoRef.current.srcObject =stream;
+                streamRef.current=stream
+                if(videoRef.current) videoRef.current.srcObject =stream;
             })
         }       
     }
-    async function loadLabeledImages(){
-        const {res} = await getUsers()
-        const labels = res?.filter((user)=>{
-            if(user.image!="")
-                return true
-            else
-                return false
-        }).map((user)=>({label:user.name+"{}"+user.id,
-            img:user.image
-        }))
-        if(!labels){
-            return
-        }
-        return Promise.all(
-            labels.map(async label =>{
-                const img = await faceapi.fetchImage(label.img)
-                const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-                if(!detections){
-                    return
-                }
-                return new faceapi.LabeledFaceDescriptors(label.label,[detections.descriptor])
-            })
-        )
+
+    const stopVideo = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current=null 
+      if (videoRef.current) {
+        videoRef.current.srcObject = null; 
+      }
     }
+  };
 
     async function handleVideoPlay(){
-        const labeledFace = await loadLabeledImages();
-        console.log(labeledFace);
-        
+        const res = await getLabeledImages();
+        if(!res.ok){
+           toast({
+                    title:"Someting Went Wrong",
+                    variant:"destructive"
+                })
+            return router.back();
+        }
+        const labeledFace = res.data!.map((desc)=>{
+            const serializedFaces = desc.faceDiscriptor as unknown as SerializedLabeledFaceDescriptors 
+            const labeledFaceDescriptor = serializedFaces.descriptors.map((d)=>new Float32Array(d))
+            return new faceapi.LabeledFaceDescriptors(
+                serializedFaces.label,
+                labeledFaceDescriptor
+            )
+        })
         const matcher = new faceapi.FaceMatcher(labeledFace,0.55)
         setTimeout(async()=>{
             if(init){
@@ -83,9 +90,9 @@ export default function(){
                 width:640,
                 height :480
             }
-            //@ts-expect-error
+            if(canvasRef.current)
             faceapi.matchDimensions(canvasRef.current,displaySize)
-            //@ts-expect-error
+            if(!videoRef.current) return
             const detections = await faceapi.detectSingleFace(videoRef.current,new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
             if(!detections){
                 return toast({
@@ -109,7 +116,7 @@ export default function(){
             
             if(box){
             const drawBox = new faceapi.draw.DrawBox(box,{label:result.toString().split("{}")[0]})
-            //@ts-expect-error
+            if(canvasRef.current)
             drawBox.draw(canvasRef.current)
             }
             console.log(result.toString().split("{}")[0]);
@@ -139,8 +146,7 @@ export default function(){
   role="status">
   <span
     className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-    >Loading...</span
-  >
+    >Loading...</span>
 </div>:<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
   <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
 </svg>
